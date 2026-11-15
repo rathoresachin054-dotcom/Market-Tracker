@@ -4,10 +4,11 @@ const apiUrl = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&o
 const coinContainer = document.getElementById("coinContainer");
 const status = document.getElementById("status");
 const refreshBtn = document.getElementById("refreshBtn");
+const searchInput = document.getElementById("searchInput");
+const sortSelect = document.getElementById("sortSelect");
 
 let allCoins = [];
 
-// Fetch coins from API
 async function getCoins() {
     status.textContent = "Loading cryptocurrency data...";
     coinContainer.innerHTML = "";
@@ -26,7 +27,7 @@ async function getCoins() {
 
         allCoins = data;
 
-        showCoins(allCoins);
+        filterCoins();
 
         status.textContent = "";
 
@@ -40,7 +41,6 @@ async function getCoins() {
     }
 }
 
-// Display coin cards
 function showCoins(coins) {
     coinContainer.innerHTML = "";
 
@@ -49,8 +49,9 @@ function showCoins(coins) {
         return;
     }
 
-    coins.forEach(function (coin) {
+    status.textContent = "";
 
+    coins.forEach(function (coin) {
         const card = document.createElement("div");
 
         card.className =
@@ -67,10 +68,10 @@ function showCoins(coins) {
 
         const price = document.createElement("p");
         price.className = "mt-3 text-xl font-semibold text-white";
-        price.textContent = "$" + coin.current_price.toLocaleString("en-US");
+        price.textContent =
+            "$" + coin.current_price.toLocaleString("en-US");
 
         const change = document.createElement("p");
-
         const changeValue = coin.price_change_percentage_24h;
 
         change.className = "mt-2 text-sm font-semibold";
@@ -106,8 +107,42 @@ function showCoins(coins) {
     });
 }
 
-// Refresh button
+function filterCoins() {
+    const searchText = searchInput.value.trim().toLowerCase();
+
+    let filteredCoins = allCoins.filter(function (coin) {
+        return (
+            coin.name.toLowerCase().includes(searchText) ||
+            coin.symbol.toLowerCase().includes(searchText)
+        );
+    });
+
+    const sortValue = sortSelect.value;
+
+    if (sortValue === "price_low") {
+        filteredCoins.sort((a, b) => a.current_price - b.current_price);
+    }
+    else if (sortValue === "price_high") {
+        filteredCoins.sort((a, b) => b.current_price - a.current_price);
+    }
+    else if (sortValue === "change") {
+        filteredCoins.sort(
+            (a, b) =>
+                (b.price_change_percentage_24h || 0) -
+                (a.price_change_percentage_24h || 0)
+        );
+    }
+    else {
+        filteredCoins.sort((a, b) => b.market_cap - a.market_cap);
+    }
+
+    showCoins(filteredCoins);
+}
+
 refreshBtn.addEventListener("click", getCoins);
 
-// Initial API call
+searchInput.addEventListener("input", filterCoins);
+
+sortSelect.addEventListener("change", filterCoins);
+
 getCoins();
