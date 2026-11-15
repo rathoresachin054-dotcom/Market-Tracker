@@ -145,4 +145,4 @@ searchInput.addEventListener("input", filterCoins);
 
 sortSelect.addEventListener("change", filterCoins);
 
-getCoins();
+getCoins()
