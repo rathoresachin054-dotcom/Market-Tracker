@@ -56,6 +56,7 @@ function showCoins(coins) {
         status.textContent = currentView === "watchlist"
             ? "Your watchlist is empty!"
             : "No coins found!";
+
         return;
     }
 
@@ -72,8 +73,12 @@ function showCoins(coins) {
         image.className = "mb-4 h-12 w-12";
 
         const name = document.createElement("h3");
-        name.className = "text-lg font-bold";
+        name.className = "text-lg font-bold cursor-pointer hover:text-orange-400";
         name.textContent = coin.name + " (" + coin.symbol.toUpperCase() + ")";
+
+        name.addEventListener("click", function () {
+            showCoinDetails(coin.id);
+        });
 
         const price = document.createElement("p");
         price.className = "mt-3 text-xl font-semibold text-white";
@@ -96,13 +101,6 @@ function showCoins(coins) {
                 changeValue >= 0 ? "text-green-400" : "text-red-400"
             );
         }
-       
-
-name.classList.add("cursor-pointer", "hover:text-orange-400");
-
-name.addEventListener("click", function () {
-    showCoinDetails(coin.id);
-});
 
         const marketCap = document.createElement("p");
         marketCap.className = "mt-3 text-sm text-slate-400";
@@ -173,11 +171,24 @@ function filterCoins() {
     showCoins(coins);
 }
 
+function formatPrice(value) {
+    if (value === null || value === undefined) {
+        return "N/A";
+    }
+
+    return "$" + value.toLocaleString("en-US");
+}
+
 async function showCoinDetails(coinId) {
     coinContainer.classList.add("hidden");
     coinDetails.classList.remove("hidden");
 
-    detailContent.innerHTML = "Loading coin details...";
+    detailContent.innerHTML = `
+        <div class="text-center py-10">
+            <div class="animate-spin mx-auto h-10 w-10 rounded-full border-4 border-orange-500 border-t-transparent"></div>
+            <p class="mt-4 text-slate-400">Loading coin details...</p>
+        </div>
+    `;
 
     try {
         const response = await fetch(
@@ -190,64 +201,151 @@ async function showCoinDetails(coinId) {
 
         const coin = await response.json();
 
+        const market = coin.market_data;
+        const price = market.current_price.usd;
+        const change = market.price_change_percentage_24h;
+
+        const changeColor = change === null
+            ? "text-slate-400"
+            : change >= 0
+                ? "text-green-400"
+                : "text-red-400";
+
+        const changeSign = change > 0 ? "+" : "";
+
+        const description = coin.description.en
+            ? coin.description.en.replace(/<[^>]*>/g, " ")
+            : "Description not available.";
+
         detailContent.innerHTML = `
-            <div class="flex flex-col gap-5">
+            <div class="space-y-8">
 
-                <div class="flex items-center gap-4">
-                    <img src="${coin.image.large}" class="h-16 w-16" alt="${coin.name}">
+                <div class="flex flex-wrap items-center justify-between gap-5">
+                    <div class="flex items-center gap-4">
+                        <img
+                            src="${coin.image.large}"
+                            alt="${coin.name}"
+                            class="h-16 w-16 rounded-full"
+                        >
 
-                    <div>
-                        <h2 class="text-3xl font-bold">${coin.name}</h2>
-                        <p class="text-slate-400">${coin.symbol.toUpperCase()}</p>
+                        <div>
+                            <h2 class="text-3xl font-bold text-white">
+                                ${coin.name}
+                            </h2>
+
+                            <p class="text-slate-400 uppercase">
+                                ${coin.symbol}
+                            </p>
+                        </div>
                     </div>
+
+                    <button
+                        id="detailWatchlistBtn"
+                        class="rounded-lg bg-orange-500 px-5 py-3 font-semibold text-white hover:bg-orange-600"
+                    >
+                        ${watchlist.includes(coin.id)
+                            ? "★ Remove from Watchlist"
+                            : "☆ Add to Watchlist"}
+                    </button>
                 </div>
 
-                <h3 class="text-3xl font-bold text-orange-400">
-                    $${coin.market_data.current_price.usd.toLocaleString("en-US")}
-                </h3>
+                <div class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+                    <p class="text-slate-400">Current Price</p>
 
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                    <h3 class="mt-2 text-4xl font-bold text-white">
+                        ${formatPrice(price)}
+                    </h3>
 
-                    <div class="rounded-xl bg-slate-800 p-4">
+                    <p class="mt-3 font-semibold ${changeColor}">
+                        ${change === null
+                            ? "24h Change: N/A"
+                            : changeSign + change.toFixed(2) + "% (24h)"}
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+
+                    <div class="rounded-xl border border-slate-800 bg-slate-900 p-5">
                         <p class="text-slate-400">Market Cap</p>
                         <h3 class="mt-2 text-xl font-bold">
-                            $${coin.market_data.market_cap.usd.toLocaleString("en-US")}
+                            ${formatPrice(market.market_cap.usd)}
                         </h3>
                     </div>
 
-                    <div class="rounded-xl bg-slate-800 p-4">
+                    <div class="rounded-xl border border-slate-800 bg-slate-900 p-5">
                         <p class="text-slate-400">24h High</p>
                         <h3 class="mt-2 text-xl font-bold text-green-400">
-                            $${coin.market_data.high_24h.usd.toLocaleString("en-US")}
+                            ${formatPrice(market.high_24h.usd)}
                         </h3>
                     </div>
 
-                    <div class="rounded-xl bg-slate-800 p-4">
+                    <div class="rounded-xl border border-slate-800 bg-slate-900 p-5">
                         <p class="text-slate-400">24h Low</p>
                         <h3 class="mt-2 text-xl font-bold text-red-400">
-                            $${coin.market_data.low_24h.usd.toLocaleString("en-US")}
+                            ${formatPrice(market.low_24h.usd)}
+                        </h3>
+                    </div>
+
+                    <div class="rounded-xl border border-slate-800 bg-slate-900 p-5">
+                        <p class="text-slate-400">All Time High</p>
+                        <h3 class="mt-2 text-xl font-bold">
+                            ${formatPrice(market.ath.usd)}
+                        </h3>
+                    </div>
+
+                    <div class="rounded-xl border border-slate-800 bg-slate-900 p-5">
+                        <p class="text-slate-400">All Time Low</p>
+                        <h3 class="mt-2 text-xl font-bold">
+                            ${formatPrice(market.atl.usd)}
+                        </h3>
+                    </div>
+
+                    <div class="rounded-xl border border-slate-800 bg-slate-900 p-5">
+                        <p class="text-slate-400">Total Supply</p>
+                        <h3 class="mt-2 text-xl font-bold">
+                            ${market.total_supply === null
+                                ? "N/A"
+                                : market.total_supply.toLocaleString("en-US")}
                         </h3>
                     </div>
 
                 </div>
 
-                <div>
-                    <h3 class="mb-3 text-xl font-bold">About ${coin.name}</h3>
+                <div class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+                    <h3 class="mb-4 text-2xl font-bold">
+                        About ${coin.name}
+                    </h3>
 
-                    <div class="text-slate-300 leading-7">
-                        ${coin.description.en || "Description not available."}
+                    <div class="leading-8 text-slate-300">
+                        ${description}
                     </div>
                 </div>
 
             </div>
         `;
 
+        document.getElementById("detailWatchlistBtn")
+            .addEventListener("click", function () {
+                if (watchlist.includes(coin.id)) {
+                    watchlist = watchlist.filter(id => id !== coin.id);
+                } else {
+                    watchlist.push(coin.id);
+                }
+
+                localStorage.setItem("watchlist", JSON.stringify(watchlist));
+
+                this.textContent = watchlist.includes(coin.id)
+                    ? "★ Remove from Watchlist"
+                    : "☆ Add to Watchlist";
+            });
+
     } catch (error) {
-        detailContent.textContent = "Unable to load coin details. Please try again.";
+        detailContent.textContent =
+            "Unable to load coin details. Please try again.";
+
         console.log(error);
     }
 }
-
 
 refreshBtn.addEventListener("click", getCoins);
 
@@ -278,7 +376,7 @@ watchlistBtn.addEventListener("click", function () {
 backBtn.addEventListener("click", function () {
     coinDetails.classList.add("hidden");
     coinContainer.classList.remove("hidden");
+    filterCoins();
 });
-
 
 getCoins();
