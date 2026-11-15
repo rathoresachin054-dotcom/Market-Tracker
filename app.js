@@ -9,6 +9,9 @@ const sortSelect = document.getElementById("sortSelect");
 const homeBtn = document.getElementById("homeBtn");
 const watchlistBtn = document.getElementById("watchlistBtn");
 const sectionTitle = document.getElementById("sectionTitle");
+const coinDetails = document.getElementById("coinDetails");
+const detailContent = document.getElementById("detailContent");
+const backBtn = document.getElementById("backBtn");
 
 let watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
 let currentView = "home";
@@ -93,10 +96,11 @@ function showCoins(coins) {
                 changeValue >= 0 ? "text-green-400" : "text-red-400"
             );
         }
-        const coindetail = document.createElement("h3");
-        name.classList.add("cursor-pointer");
+       
 
-coindetail.addEventListener("click", function () {
+name.classList.add("cursor-pointer", "hover:text-orange-400");
+
+name.addEventListener("click", function () {
     showCoinDetails(coin.id);
 });
 
