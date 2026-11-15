@@ -6,7 +6,12 @@ const status = document.getElementById("status");
 const refreshBtn = document.getElementById("refreshBtn");
 const searchInput = document.getElementById("searchInput");
 const sortSelect = document.getElementById("sortSelect");
+const homeBtn = document.getElementById("homeBtn");
+const watchlistBtn = document.getElementById("watchlistBtn");
+const sectionTitle = document.getElementById("sectionTitle");
 
+let watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
+let currentView = "home";
 let allCoins = [];
 
 async function getCoins() {
@@ -45,7 +50,9 @@ function showCoins(coins) {
     coinContainer.innerHTML = "";
 
     if (coins.length === 0) {
-        status.textContent = "No coins found!";
+        status.textContent = currentView === "watchlist"
+            ? "Your watchlist is empty!"
+            : "No coins found!";
         return;
     }
 
@@ -54,8 +61,7 @@ function showCoins(coins) {
     coins.forEach(function (coin) {
         const card = document.createElement("div");
 
-        card.className =
-            "rounded-2xl border border-slate-800 bg-slate-900 p-5 transition hover:-translate-y-1 hover:border-orange-400";
+        card.className = "rounded-2xl border border-slate-800 bg-slate-900 p-5 transition hover:-translate-y-1 hover:border-orange-400";
 
         const image = document.createElement("img");
         image.src = coin.image;
@@ -68,8 +74,7 @@ function showCoins(coins) {
 
         const price = document.createElement("p");
         price.className = "mt-3 text-xl font-semibold text-white";
-        price.textContent =
-            "$" + coin.current_price.toLocaleString("en-US");
+        price.textContent = "$" + coin.current_price.toLocaleString("en-US");
 
         const change = document.createElement("p");
         const changeValue = coin.price_change_percentage_24h;
@@ -82,8 +87,7 @@ function showCoins(coins) {
         } else {
             const sign = changeValue > 0 ? "+" : "";
 
-            change.textContent =
-                "24h Change: " + sign + changeValue.toFixed(2) + "%";
+            change.textContent = "24h Change: " + sign + changeValue.toFixed(2) + "%";
 
             change.classList.add(
                 changeValue >= 0 ? "text-green-400" : "text-red-400"
@@ -92,25 +96,48 @@ function showCoins(coins) {
 
         const marketCap = document.createElement("p");
         marketCap.className = "mt-3 text-sm text-slate-400";
-        marketCap.textContent =
-            "Market Cap: $" + coin.market_cap.toLocaleString("en-US");
+        marketCap.textContent = "Market Cap: $" + coin.market_cap.toLocaleString("en-US");
 
-        card.append(
-            image,
-            name,
-            price,
-            change,
-            marketCap
-        );
+        const watchlistButton = document.createElement("button");
+        const isSaved = watchlist.includes(coin.id);
+
+        watchlistButton.textContent = isSaved
+            ? "★ Remove from Watchlist"
+            : "☆ Add to Watchlist";
+
+        watchlistButton.dataset.action = "watchlist";
+        watchlistButton.dataset.id = coin.id;
+
+        watchlistButton.className = "mt-4 w-full rounded-lg bg-orange-500 px-4 py-2 font-semibold text-white hover:bg-orange-600";
+
+        card.append(image, name, price, change, marketCap, watchlistButton);
 
         coinContainer.appendChild(card);
     });
 }
 
+function toggleWatchlist(coinId) {
+    if (watchlist.includes(coinId)) {
+        watchlist = watchlist.filter(function (id) {
+            return id !== coinId;
+        });
+    } else {
+        watchlist.push(coinId);
+    }
+
+    localStorage.setItem("watchlist", JSON.stringify(watchlist));
+
+    filterCoins();
+}
+
 function filterCoins() {
     const searchText = searchInput.value.trim().toLowerCase();
 
-    let filteredCoins = allCoins.filter(function (coin) {
+    let coins = currentView === "watchlist"
+        ? allCoins.filter(coin => watchlist.includes(coin.id))
+        : [...allCoins];
+
+    coins = coins.filter(function (coin) {
         return (
             coin.name.toLowerCase().includes(searchText) ||
             coin.symbol.toLowerCase().includes(searchText)
@@ -120,23 +147,20 @@ function filterCoins() {
     const sortValue = sortSelect.value;
 
     if (sortValue === "price_low") {
-        filteredCoins.sort((a, b) => a.current_price - b.current_price);
-    }
-    else if (sortValue === "price_high") {
-        filteredCoins.sort((a, b) => b.current_price - a.current_price);
-    }
-    else if (sortValue === "change") {
-        filteredCoins.sort(
+        coins.sort((a, b) => a.current_price - b.current_price);
+    } else if (sortValue === "price_high") {
+        coins.sort((a, b) => b.current_price - a.current_price);
+    } else if (sortValue === "change") {
+        coins.sort(
             (a, b) =>
                 (b.price_change_percentage_24h || 0) -
                 (a.price_change_percentage_24h || 0)
         );
-    }
-    else {
-        filteredCoins.sort((a, b) => b.market_cap - a.market_cap);
+    } else {
+        coins.sort((a, b) => b.market_cap - a.market_cap);
     }
 
-    showCoins(filteredCoins);
+    showCoins(coins);
 }
 
 refreshBtn.addEventListener("click", getCoins);
@@ -145,4 +169,24 @@ searchInput.addEventListener("input", filterCoins);
 
 sortSelect.addEventListener("change", filterCoins);
 
-getCoins()
+coinContainer.addEventListener("click", function (event) {
+    const button = event.target.closest('[data-action="watchlist"]');
+
+    if (button) {
+        toggleWatchlist(button.dataset.id);
+    }
+});
+
+homeBtn.addEventListener("click", function () {
+    currentView = "home";
+    sectionTitle.textContent = "Top Cryptocurrencies";
+    filterCoins();
+});
+
+watchlistBtn.addEventListener("click", function () {
+    currentView = "watchlist";
+    sectionTitle.textContent = "My Watchlist";
+    filterCoins();
+});
+
+getCoins();
