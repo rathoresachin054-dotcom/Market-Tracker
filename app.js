@@ -18,9 +18,7 @@ let currentView = "home";
 let allCoins = [];
 
 function formatPrice(value) {
-    if (value === null || value === undefined) {
-        return "N/A";
-    }
+    if (value === null || value === undefined) return "N/A";
 
     return "$" + Number(value).toLocaleString("en-US", {
         maximumFractionDigits: 8
@@ -28,9 +26,7 @@ function formatPrice(value) {
 }
 
 function formatNumber(value) {
-    if (value === null || value === undefined) {
-        return "N/A";
-    }
+    if (value === null || value === undefined) return "N/A";
 
     return Number(value).toLocaleString("en-US", {
         maximumFractionDigits: 2
@@ -57,7 +53,6 @@ async function getCoins() {
         }
 
         allCoins = await response.json();
-
         filterCoins();
 
     } catch (error) {
@@ -90,7 +85,7 @@ function showCoins(coins) {
 
         card.dataset.coinId = coin.id;
 
-        card.className = "group min-w-0 cursor-pointer overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 p-5 transition duration-300 hover:-translate-y-1 hover:border-orange-400 hover:shadow-xl hover:shadow-orange-500/5 active:scale-[0.98]";
+        card.className = "group min-w-0 cursor-pointer overflow-hidden rounded-2xl border border-slate-800 bg-gradient-to-br from-[#111B2E] to-[#0D1526] p-5 transition duration-300 hover:-translate-y-1 hover:border-cyan-400/60 hover:shadow-xl hover:shadow-cyan-500/10 active:scale-[0.98]";
 
         const top = document.createElement("div");
         top.className = "flex items-center justify-between gap-3";
@@ -107,7 +102,7 @@ function showCoins(coins) {
         info.className = "min-w-0";
 
         const name = document.createElement("h3");
-        name.className = "truncate text-base font-bold transition group-hover:text-orange-400";
+        name.className = "truncate text-base font-bold transition group-hover:text-cyan-400";
         name.textContent = coin.name;
 
         const symbol = document.createElement("p");
@@ -118,7 +113,7 @@ function showCoins(coins) {
         left.append(image, info);
 
         const rank = document.createElement("span");
-        rank.className = "shrink-0 rounded-lg bg-slate-800 px-3 py-1 text-xs text-slate-400";
+        rank.className = "shrink-0 rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-1 text-xs text-cyan-300";
         rank.textContent = "#" + (coin.market_cap_rank || index + 1);
 
         top.append(left, rank);
@@ -138,8 +133,7 @@ function showCoins(coins) {
         } else {
             const sign = changeValue > 0 ? "+" : "";
 
-            change.textContent =
-                sign + changeValue.toFixed(2) + "% (24h)";
+            change.textContent = sign + changeValue.toFixed(2) + "% (24h)";
 
             change.classList.add(
                 changeValue >= 0 ? "text-green-400" : "text-red-400"
@@ -172,7 +166,7 @@ function showCoins(coins) {
             ? "★ Remove from Watchlist"
             : "☆ Add to Watchlist";
 
-        watchlistButton.className = "relative z-10 mt-5 w-full rounded-xl bg-orange-500/10 px-4 py-3 text-sm font-semibold text-orange-400 transition hover:bg-orange-500 hover:text-white";
+        watchlistButton.className = "relative z-10 mt-5 w-full rounded-xl border border-cyan-400/20 bg-cyan-400/10 px-4 py-3 text-sm font-semibold text-cyan-300 transition hover:bg-cyan-400 hover:text-slate-950";
 
         card.append(
             top,
@@ -238,7 +232,7 @@ async function showCoinDetails(coinId) {
 
     detailContent.innerHTML = `
         <div class="flex min-h-64 flex-col items-center justify-center gap-4">
-            <div class="h-12 w-12 animate-spin rounded-full border-4 border-orange-500 border-t-transparent"></div>
+            <div class="h-12 w-12 animate-spin rounded-full border-4 border-cyan-400 border-t-transparent"></div>
             <p class="text-sm text-slate-400">Loading coin details...</p>
         </div>
     `;
@@ -336,11 +330,11 @@ async function showCoinDetails(coinId) {
                         >
 
                         <div class="min-w-0">
-                            <h2 class="break-words text-2xl font-bold sm:text-3xl">
+                            <h2 class="break-words text-2xl font-bold text-white sm:text-3xl">
                                 ${coin.name}
                             </h2>
 
-                            <p class="mt-1 text-sm uppercase text-slate-400">
+                            <p class="mt-1 text-sm uppercase text-cyan-400">
                                 ${coin.symbol}
                             </p>
 
@@ -353,7 +347,7 @@ async function showCoinDetails(coinId) {
 
                     <button
                         id="detailWatchlistBtn"
-                        class="w-full shrink-0 rounded-xl bg-orange-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-orange-600 sm:w-auto"
+                        class="w-full shrink-0 rounded-xl border border-cyan-400/20 bg-cyan-400/10 px-5 py-3 text-sm font-semibold text-cyan-300 transition hover:bg-cyan-400 hover:text-slate-950 sm:w-auto"
                     >
                         ${watchlist.includes(coin.id)
                             ? "★ Remove from Watchlist"
@@ -362,13 +356,13 @@ async function showCoinDetails(coinId) {
 
                 </div>
 
-                <div class="rounded-2xl border border-slate-700 bg-gradient-to-br from-slate-800 to-slate-900 p-5 sm:p-8">
+                <div class="rounded-2xl border border-cyan-400/20 bg-gradient-to-br from-[#172A42] to-[#111B2E] p-5 shadow-lg shadow-cyan-500/5 sm:p-8">
 
                     <p class="text-sm text-slate-400">
                         Current Price
                     </p>
 
-                    <h2 class="mt-3 break-all text-3xl font-bold sm:text-5xl">
+                    <h2 class="mt-3 break-all text-3xl font-bold text-white sm:text-5xl">
                         ${formatPrice(market.current_price?.usd)}
                     </h2>
 
@@ -390,14 +384,14 @@ async function showCoinDetails(coinId) {
 
                 <div>
 
-                    <h3 class="mb-4 text-lg font-bold sm:text-xl">
+                    <h3 class="mb-4 text-lg font-bold text-white sm:text-xl">
                         Market Statistics
                     </h3>
 
                     <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
 
                         ${stats.map(item => `
-                            <div class="min-w-0 rounded-xl border border-slate-700 bg-slate-950/70 p-4 sm:p-5">
+                            <div class="min-w-0 rounded-xl border border-slate-700 bg-[#0D1526] p-4 transition hover:border-cyan-400/40 sm:p-5">
 
                                 <p class="text-xs text-slate-400 sm:text-sm">
                                     ${item.label}
@@ -414,9 +408,9 @@ async function showCoinDetails(coinId) {
 
                 </div>
 
-                <div class="rounded-2xl border border-slate-700 bg-slate-950/70 p-5 sm:p-7">
+                <div class="rounded-2xl border border-slate-700 bg-[#0D1526] p-5 sm:p-7">
 
-                    <h3 class="mb-4 text-lg font-bold sm:text-xl">
+                    <h3 class="mb-4 text-lg font-bold text-white sm:text-xl">
                         About ${coin.name}
                     </h3>
 
@@ -457,7 +451,7 @@ async function showCoinDetails(coinId) {
 
                 <button
                     id="retryDetailsBtn"
-                    class="mt-4 rounded-lg bg-orange-500 px-5 py-2 text-sm font-semibold text-white"
+                    class="mt-4 rounded-lg bg-cyan-400 px-5 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
                 >
                     Try Again
                 </button>

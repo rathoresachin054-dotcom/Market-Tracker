@@ -5,8 +5,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>CryptoTracker | Market Overview</title>
+    <meta name="theme-color" content="#080D1A">
+    <title>Cryptova | Crypto Market Tracker</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -39,13 +39,17 @@
         }
 
         #detailContent a {
-            color: #fb923c;
+            color: #22d3ee;
         }
 
         #detailContent table {
             display: block;
             max-width: 100%;
             overflow-x: auto;
+        }
+
+        #coinContainer > * {
+            min-width: 0;
         }
 
         @media (max-width: 640px) {
@@ -73,34 +77,49 @@
     </style>
 </head>
 
-<body class="min-h-screen bg-slate-950 text-white">
+<body class="min-h-screen bg-[#080D1A] text-slate-100">
 
-    <nav class="sticky top-0 z-50 border-b border-slate-800 bg-slate-900/95 backdrop-blur">
+    <nav class="sticky top-0 z-50 border-b border-slate-800/80 bg-[#0D1526]/95 backdrop-blur-xl">
 
         <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
 
-            <div>
-                <h1 class="text-xl font-bold text-orange-400 sm:text-2xl">
-                    CryptoTracker.
-                </h1>
+            <a href="#" class="flex items-center gap-3">
 
-                <p class="text-xs text-slate-400">
-                    Your crypto market dashboard
-                </p>
-            </div>
+                <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-400 to-violet-600 shadow-lg shadow-cyan-500/20">
+
+                    <svg viewBox="0 0 24 24" fill="none" class="h-7 w-7 text-white">
+                        <path d="M12 2.8 20 7.4v9.2l-8 4.6-8-4.6V7.4l8-4.6Z" stroke="currentColor" stroke-width="1.8"/>
+                        <path d="M8 14.5V11m4 3.5V7.5m4 7V9.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+
+                </div>
+
+                <div>
+                    <h1 class="text-xl font-extrabold tracking-wide text-white sm:text-2xl">
+                        CRYPT<span class="text-cyan-400">OVA</span>
+                    </h1>
+
+                    <p class="text-[10px] tracking-widest text-slate-400 sm:text-xs">
+                        CRYPTO MARKET INTELLIGENCE
+                    </p>
+                </div>
+
+            </a>
 
             <div class="flex flex-wrap gap-2 sm:gap-3">
 
                 <button
                     id="homeBtn"
-                    class="rounded-lg bg-slate-800 px-3 py-2 text-sm transition hover:bg-orange-500 sm:px-5"
+                    type="button"
+                    class="rounded-lg border border-cyan-400/20 bg-cyan-400/10 px-3 py-2 text-sm font-medium text-cyan-300 transition hover:bg-cyan-400 hover:text-slate-950 sm:px-5"
                 >
                     Markets
                 </button>
 
                 <button
                     id="watchlistBtn"
-                    class="rounded-lg bg-slate-800 px-3 py-2 text-sm transition hover:bg-orange-500 sm:px-5"
+                    type="button"
+                    class="rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-sm font-medium text-slate-200 transition hover:border-violet-400 hover:bg-violet-500/20 hover:text-violet-300 sm:px-5"
                 >
                     Watchlist ★
                 </button>
@@ -115,16 +134,25 @@
 
         <section class="mb-8 sm:mb-10">
 
-            <p class="mb-2 text-xs font-semibold uppercase tracking-widest text-orange-400 sm:text-sm">
-                Market Overview
-            </p>
+            <div class="mb-3 inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1.5">
 
-            <h2 class="text-2xl font-bold leading-tight sm:text-4xl lg:text-5xl">
-                Cryptocurrency Market
+                <span class="h-2 w-2 animate-pulse rounded-full bg-cyan-400"></span>
+
+                <p class="text-xs font-semibold uppercase tracking-widest text-cyan-300">
+                    Market Overview
+                </p>
+
+            </div>
+
+            <h2 class="text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl lg:text-5xl">
+                Explore the
+                <span class="bg-gradient-to-r from-cyan-400 to-violet-400 bg-clip-text text-transparent">
+                    Crypto Market
+                </span>
             </h2>
 
-            <p class="mt-3 max-w-2xl text-sm leading-6 text-slate-400 sm:text-base">
-                Track prices, discover coins and manage your watchlist.
+            <p class="mt-4 max-w-2xl text-sm leading-7 text-slate-400 sm:text-base">
+                Track live cryptocurrency prices, discover trending coins and manage your personal watchlist with Cryptova.
             </p>
 
         </section>
@@ -135,35 +163,25 @@
                 id="searchInput"
                 type="text"
                 placeholder="Search cryptocurrency..."
-                class="w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm outline-none transition focus:border-orange-400 sm:px-5"
+                class="w-full rounded-xl border border-slate-700 bg-[#111B2E] px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/10 sm:px-5"
             >
 
             <select
                 id="sortSelect"
-                class="w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm outline-none transition focus:border-orange-400"
+                class="w-full rounded-xl border border-slate-700 bg-[#111B2E] px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-cyan-400"
             >
 
-                <option value="market_cap">
-                    Market Cap: High to Low
-                </option>
-
-                <option value="price_low">
-                    Price: Low to High
-                </option>
-
-                <option value="price_high">
-                    Price: High to Low
-                </option>
-
-                <option value="change">
-                    24h Change: High to Low
-                </option>
+                <option value="market_cap">Market Cap: High to Low</option>
+                <option value="price_low">Price: Low to High</option>
+                <option value="price_high">Price: High to Low</option>
+                <option value="change">24h Change: High to Low</option>
 
             </select>
 
             <button
                 id="refreshBtn"
-                class="w-full rounded-xl bg-orange-500 px-6 py-3 text-sm font-semibold transition hover:bg-orange-600 active:scale-95 sm:col-span-2 lg:col-span-1"
+                type="button"
+                class="w-full rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 px-6 py-3 text-sm font-bold text-slate-950 shadow-lg shadow-cyan-500/10 transition hover:from-cyan-300 hover:to-blue-400 active:scale-95 sm:col-span-2 lg:col-span-1"
             >
                 ↻ Refresh
             </button>
@@ -172,11 +190,11 @@
 
         <section class="mb-5 flex flex-wrap items-center justify-between gap-3">
 
-            <h3 id="sectionTitle" class="text-lg font-semibold sm:text-xl">
+            <h3 id="sectionTitle" class="text-lg font-bold text-white sm:text-xl">
                 Top Cryptocurrencies
             </h3>
 
-            <span class="text-xs text-slate-400 sm:text-sm">
+            <span class="rounded-lg border border-slate-800 bg-[#111B2E] px-3 py-1.5 text-xs text-slate-400 sm:text-sm">
                 Prices in USD
             </span>
 
@@ -184,7 +202,7 @@
 
         <p
             id="status"
-            class="mb-6 text-center text-sm text-orange-400"
+            class="mb-6 text-center text-sm text-cyan-400"
         ></p>
 
         <section
@@ -192,37 +210,48 @@
             class="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4"
         ></section>
 
-       
-<section
-    id="coinDetails"
-    class="mt-6 hidden scroll-mt-24 overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 p-4 shadow-2xl shadow-black/20 sm:mt-8 sm:p-6 lg:p-8"
->
+        <section
+            id="coinDetails"
+            class="mt-6 hidden scroll-mt-24 overflow-hidden rounded-2xl border border-slate-800 bg-[#111B2E] p-4 shadow-2xl shadow-black/20 sm:mt-8 sm:p-6 lg:p-8"
+        >
 
-    <button
-        id="backBtn"
-        type="button"
-        class="mb-6 flex w-full items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 py-3 text-sm font-bold text-white transition hover:bg-orange-600 sm:w-auto"
-    >
-        ← Back to Market
-    </button>
+            <button
+                id="backBtn"
+                type="button"
+                class="mb-6 flex w-full items-center justify-center gap-2 rounded-xl border border-cyan-400/20 bg-cyan-400/10 px-5 py-3 text-sm font-bold text-cyan-300 transition hover:bg-cyan-400 hover:text-slate-950 sm:w-auto"
+            >
+                ← Back to Market
+            </button>
 
-    <div id="detailContent" class="min-w-0 w-full"></div>
+            <div id="detailContent" class="min-w-0 w-full"></div>
 
-</section>
-
+        </section>
 
         <footer class="mt-12 border-t border-slate-800 py-7 text-center sm:mt-16">
 
-            <h3 class="text-lg font-bold text-orange-400">
-                CryptoTracker.
-            </h3>
+            <div class="mb-3 flex items-center justify-center gap-2">
 
-            <p class="mt-2 text-xs text-slate-500 sm:text-sm">
-                Cryptocurrency Market Tracker using CoinGecko API
+                <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-400 to-violet-600">
+
+                    <svg viewBox="0 0 24 24" fill="none" class="h-5 w-5 text-white">
+                        <path d="M12 2.8 20 7.4v9.2l-8 4.6-8-4.6V7.4l8-4.6Z" stroke="currentColor" stroke-width="1.8"/>
+                        <path d="M8 14.5V11m4 3.5V7.5m4 7V9.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+
+                </div>
+
+                <h3 class="text-lg font-extrabold tracking-wide text-white">
+                    CRYPT<span class="text-cyan-400">OVA</span>
+                </h3>
+
+            </div>
+
+            <p class="text-xs text-slate-500 sm:text-sm">
+                Cryptocurrency Market Tracker powered by CoinGecko API
             </p>
 
-            <p class="mt-2 text-xs text-slate-600">
-                © 2026 CryptoTracker. All rights reserved.
+            <p class="mt-3 text-xs text-slate-600">
+                © 2026 Cryptova. All rights reserved.
             </p>
 
         </footer>
