@@ -93,6 +93,12 @@ function showCoins(coins) {
                 changeValue >= 0 ? "text-green-400" : "text-red-400"
             );
         }
+        const coindetail = document.createElement("h3");
+        name.classList.add("cursor-pointer");
+
+coindetail.addEventListener("click", function () {
+    showCoinDetails(coin.id);
+});
 
         const marketCap = document.createElement("p");
         marketCap.className = "mt-3 text-sm text-slate-400";
@@ -163,6 +169,82 @@ function filterCoins() {
     showCoins(coins);
 }
 
+async function showCoinDetails(coinId) {
+    coinContainer.classList.add("hidden");
+    coinDetails.classList.remove("hidden");
+
+    detailContent.innerHTML = "Loading coin details...";
+
+    try {
+        const response = await fetch(
+            `https://api.coingecko.com/api/v3/coins/${coinId}`
+        );
+
+        if (!response.ok) {
+            throw new Error("Unable to fetch coin details");
+        }
+
+        const coin = await response.json();
+
+        detailContent.innerHTML = `
+            <div class="flex flex-col gap-5">
+
+                <div class="flex items-center gap-4">
+                    <img src="${coin.image.large}" class="h-16 w-16" alt="${coin.name}">
+
+                    <div>
+                        <h2 class="text-3xl font-bold">${coin.name}</h2>
+                        <p class="text-slate-400">${coin.symbol.toUpperCase()}</p>
+                    </div>
+                </div>
+
+                <h3 class="text-3xl font-bold text-orange-400">
+                    $${coin.market_data.current_price.usd.toLocaleString("en-US")}
+                </h3>
+
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+
+                    <div class="rounded-xl bg-slate-800 p-4">
+                        <p class="text-slate-400">Market Cap</p>
+                        <h3 class="mt-2 text-xl font-bold">
+                            $${coin.market_data.market_cap.usd.toLocaleString("en-US")}
+                        </h3>
+                    </div>
+
+                    <div class="rounded-xl bg-slate-800 p-4">
+                        <p class="text-slate-400">24h High</p>
+                        <h3 class="mt-2 text-xl font-bold text-green-400">
+                            $${coin.market_data.high_24h.usd.toLocaleString("en-US")}
+                        </h3>
+                    </div>
+
+                    <div class="rounded-xl bg-slate-800 p-4">
+                        <p class="text-slate-400">24h Low</p>
+                        <h3 class="mt-2 text-xl font-bold text-red-400">
+                            $${coin.market_data.low_24h.usd.toLocaleString("en-US")}
+                        </h3>
+                    </div>
+
+                </div>
+
+                <div>
+                    <h3 class="mb-3 text-xl font-bold">About ${coin.name}</h3>
+
+                    <div class="text-slate-300 leading-7">
+                        ${coin.description.en || "Description not available."}
+                    </div>
+                </div>
+
+            </div>
+        `;
+
+    } catch (error) {
+        detailContent.textContent = "Unable to load coin details. Please try again.";
+        console.log(error);
+    }
+}
+
+
 refreshBtn.addEventListener("click", getCoins);
 
 searchInput.addEventListener("input", filterCoins);
@@ -188,5 +270,11 @@ watchlistBtn.addEventListener("click", function () {
     sectionTitle.textContent = "My Watchlist";
     filterCoins();
 });
+
+backBtn.addEventListener("click", function () {
+    coinDetails.classList.add("hidden");
+    coinContainer.classList.remove("hidden");
+});
+
 
 getCoins();
