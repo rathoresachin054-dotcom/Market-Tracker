@@ -37,13 +37,21 @@ function showStatus(message) {
     status.textContent = message;
 }
 
+function updateWatchlistButton(button, coinId) {
+    const isAdded = watchlist.includes(coinId);
+
+    button.innerHTML = isAdded
+        ? '<i class="fa-solid fa-star"></i> Remove from Watchlist'
+        : '<i class="fa-regular fa-star"></i> Add to Watchlist';
+}
+
 async function getCoins() {
     showStatus("Loading cryptocurrency data...");
 
     coinContainer.innerHTML = "";
 
     refreshBtn.disabled = true;
-    refreshBtn.textContent = "Loading...";
+    refreshBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Loading...';
 
     try {
         const response = await fetch(apiUrl);
@@ -61,7 +69,7 @@ async function getCoins() {
 
     } finally {
         refreshBtn.disabled = false;
-        refreshBtn.textContent = "↻ Refresh";
+        refreshBtn.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Refresh';
     }
 }
 
@@ -162,11 +170,9 @@ function showCoins(coins) {
         watchlistButton.dataset.action = "watchlist";
         watchlistButton.dataset.id = coin.id;
 
-        watchlistButton.textContent = watchlist.includes(coin.id)
-            ? "★ Remove from Watchlist"
-            : "☆ Add to Watchlist";
-
         watchlistButton.className = "relative z-10 mt-5 w-full rounded-xl border border-cyan-400/20 bg-cyan-400/10 px-4 py-3 text-sm font-semibold text-cyan-300 transition hover:bg-cyan-400 hover:text-slate-950";
+
+        updateWatchlistButton(watchlistButton, coin.id);
 
         card.append(
             top,
@@ -211,14 +217,17 @@ function filterCoins() {
 
     if (sortValue === "price_low") {
         coins.sort((a, b) => a.current_price - b.current_price);
+
     } else if (sortValue === "price_high") {
         coins.sort((a, b) => b.current_price - a.current_price);
+
     } else if (sortValue === "change") {
         coins.sort(
             (a, b) =>
                 (b.price_change_percentage_24h || 0) -
                 (a.price_change_percentage_24h || 0)
         );
+
     } else {
         coins.sort((a, b) => b.market_cap - a.market_cap);
     }
@@ -256,7 +265,7 @@ async function showCoinDetails(coinId) {
 
         const change = market.price_change_percentage_24h;
 
-        const changeColor = change === null
+        const changeColor = change === null || change === undefined
             ? "text-slate-400"
             : change >= 0
                 ? "text-green-400"
@@ -349,9 +358,6 @@ async function showCoinDetails(coinId) {
                         id="detailWatchlistBtn"
                         class="w-full shrink-0 rounded-xl border border-cyan-400/20 bg-cyan-400/10 px-5 py-3 text-sm font-semibold text-cyan-300 transition hover:bg-cyan-400 hover:text-slate-950 sm:w-auto"
                     >
-                        ${watchlist.includes(coin.id)
-                            ? "★ Remove from Watchlist"
-                            : "☆ Add to Watchlist"}
                     </button>
 
                 </div>
@@ -369,7 +375,7 @@ async function showCoinDetails(coinId) {
                     <div class="mt-4 flex flex-wrap items-center gap-3">
 
                         <span class="rounded-lg bg-slate-950 px-3 py-2 text-sm font-semibold ${changeColor}">
-                            ${change === null
+                            ${change === null || change === undefined
                                 ? "N/A"
                                 : changeSign + change.toFixed(2) + "%"}
                         </span>
@@ -423,23 +429,21 @@ async function showCoinDetails(coinId) {
             </div>
         `;
 
-        document.getElementById("detailWatchlistBtn")
-            .addEventListener("click", function () {
-                if (watchlist.includes(coin.id)) {
-                    watchlist = watchlist.filter(id => id !== coin.id);
-                } else {
-                    watchlist.push(coin.id);
-                }
+        const detailWatchlistBtn = document.getElementById("detailWatchlistBtn");
 
-                localStorage.setItem(
-                    "watchlist",
-                    JSON.stringify(watchlist)
-                );
+        updateWatchlistButton(detailWatchlistBtn, coin.id);
 
-                this.textContent = watchlist.includes(coin.id)
-                    ? "★ Remove from Watchlist"
-                    : "☆ Add to Watchlist";
-            });
+        detailWatchlistBtn.addEventListener("click", function () {
+            if (watchlist.includes(coin.id)) {
+                watchlist = watchlist.filter(id => id !== coin.id);
+            } else {
+                watchlist.push(coin.id);
+            }
+
+            localStorage.setItem("watchlist", JSON.stringify(watchlist));
+
+            updateWatchlistButton(this, coin.id);
+        });
 
     } catch (error) {
         detailContent.innerHTML = `
